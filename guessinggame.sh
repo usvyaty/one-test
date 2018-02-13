@@ -9,18 +9,38 @@
 #              it displays a message stating if it is bigger or smaller and asks for another number. 
 #              This continues until the numbers match.
 #Run Info      This script runs until the  number match or it is cancelled (Cntr-C)
-file_count=$(find -type f|wc -l)
-cur_dir=$(pwd)
-let guessed_count=file_count+1
-mess="Try to guess the number of files in the current directory: $cur_dir"
-while [ $file_count -ne $guessed_count ]
-do 
-	read -p "$mess" guessed_count
-	if [[ ! $guessed_count || $guessed_count =~ [^0-9] ]] 
-	then
-    		echo "Error: '$guessed_count' is not a number." 
-	        continue
-	fi
+function isvalid_number {
+	if [[ ! $1 || $1 =~ [^0-9] ]]
+        then
+		return 1			
+	else
+		return 0	
+        fi
+}
+function get_number_from_input {
+ 	local s=${@}
+	read -p "$s" in
+	while ! (isvalid_number $in)
+	do
+                echo "Error: '$in' is not a number" > /dev/stderr 
+                read -p "$s" in
+        done
+	echo $in 
+}
+function get_number_files {
+	echo  $(find -maxdepth $1 -type f  |wc -l)
+}
 
-	echo "guessed: $guessed_number actual:$file_count" 
+cur_dir=$(pwd)
+mess="Guess the number of files in the current directory($cur_dir): "
+
+file_count=$(get_number_files 1)
+let guessed_count=file_count+1
+
+while [ $file_count -ne $guessed_count ]
+do
+	guessed_count=$(get_number_from_input $mess)
+	[[ $guessed_count -lt file_count ]] && echo "Your guess is too low, please try again"
+	[[ $guessed_count -gt file_count ]] && echo "Your guess is too high, please try again" 
 done
+echo "Well done you have guessed it right!!!"
