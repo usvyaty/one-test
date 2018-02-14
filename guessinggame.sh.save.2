@@ -1,0 +1,26 @@
+#! /bin/bash
+#Script name:  guessinggame.sh
+#
+# Author:      Ying Yang
+# Date :       13-feb-2018
+#
+# Description: The following script accept a number from the users input 
+#              and compares it with the number of files in teh current directory.  If the input number is different
+#              it displays a message stating if it is bigger or smaller and asks for another number. 
+#              This continues until the numbers match.
+#Run Info      This script runs until the  number match or it is cancelled (Cntr-C)
+file_count=$(find -type f|wc -l)
+cur_dir=$(pwd)
+let guessed_count=file_count+1
+echo "$guessed_count"
+while [ file_count -ne guessed_count ]
+do 
+	read -p "Try to guess the number of files in the current directory: $cur_dir" guessed_count
+	if [[ ! $guessed_count || $guessed_count =~ [^0-9] ]] 
+	then
+    		echo "Error: '$guessed_count' is not a number." 
+	        continue
+	fi
+
+	echo "guessed: $guessed_number actual:$file_count" 
+done
